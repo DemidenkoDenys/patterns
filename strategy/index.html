@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <script src='strategy.js'></script>
+
+  <link href="../css/theme.css" rel="stylesheet" type="text/css">
+
+  <title>Стратегия паттерн</title>
+</head>
+
+<body>
+
+  <form oninput='result.value = a.execute(action.value, firstValue.value, secondValue.value)'>
+    <input  name='firstValue' type="number">
+    <select name="action" id="action">
+      <option value="add">+</option>
+      <option value="subtract">-</option>
+      <option value="multiply">*</option>
+      <option value="divide">/</option>
+    </select>
+    <input  name='secondValue' type="number">
+    <p>Результат: <output name='result'></output></p>
+  </form>
+
+  <pre>
+    <code data-language="javascript">
+
+      /** Паттерн стратегия на примере калькулятора */
+      var Calculator = (function () {
+
+          /** Создает конструктор */
+          function Calculator() {
+
+              /** Встроенные стратегии */
+              this._methods = {
+
+                  /** Стратегия сложения */
+                  add: function (x, y) {
+                      return Number(x) + Number(y);
+                  },
+
+                  /** Стратегия вычитания */
+                  subtract: function (x, y) {
+                      return x - y;
+                  },
+
+                  /**Стратегия умножения */
+                  multiply: function (x, y) {
+                      return x * y;
+                  },
+
+                  /** Стратегия деления */
+                  divide: function (x, y) {
+                      return x / y;
+                  }
+              };
+          }
+
+          /** Функция добавления стратегии */
+          Calculator.prototype.set = function (name, method) {
+            this._methods[name] = this._methods[name] !== indefined ? method : this._methods[name];
+            return this;
+          };
+
+          /** Вызов метода с указанием стратегии и передачей параметров */
+          Calculator.prototype.execute = function (method, x, y) {
+              if (this._methods[method] !== undefined) {
+                  return this._methods[method](x, y);
+              } else {
+                  throw new Error('Method does not exists!');
+              }
+          };
+
+          return Calculator;
+      })();
+
+      /** создаем экземпляр калькулятора */
+      var a = new Calculator();
+
+      /** добавляем стратегию (возведение в степень) */
+          a.set('pow', function(a, b){
+            return Math.pow(a, b);
+          });
+    </code>
+  </pre>
+
+  <script src='../js/rainbow-custom.min.js'></script>
+</body>
+</html>
