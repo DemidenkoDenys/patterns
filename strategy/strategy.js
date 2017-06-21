@@ -35,7 +35,7 @@ var Calculator = (function () {
 
     /** Добавление стратегии */
     Calculator.prototype.set = function (name, method) {
-      this._methods[name] = this._methods[name] !== indefined ? method : this._methods[name];
+      this._methods[name] = this._methods[name] !== undefined ? method : this._methods[name];
       return this;
     };
 
