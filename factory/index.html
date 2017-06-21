@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <script src='strategy.js'></script>
+
+  <link href="../css/back-button.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <title>Стратегия паттерн</title>
+</head>
+
+<body>
+
+  <pre>
+    <code data-language="javascript">
+      var corolla  = CarMaker.factory(‘Compact’);
+      var solstice = CarMaker.factory(‘Convertible’);
+      var cherokee = CarMaker.factory(‘SUV’);
+
+       corolla.drive(); // “Vroom, I have 4 doors”
+      solstice.drive(); // “Vroom, I have 2 doors”
+      cherokee.drive(); // “Vroom, I have 24 doors”
+
+      /* Эта часть:
+            var corolla = CarMaker.factory(‘Compact’);
+         является, вероятно, самой узнаваемой в шаблоне фабрики. Имеется метод, принимающий тип объекта в виде строки и создающий объект указанного типа. Нет никаких конструкторов, вызываемых с оператором new, никаких литералов объектов – только функция, создающая объект, опираясь на тип, определяемый строкой. Ниже приводится пример реализации шаблона фабрики, который обеспечивает работоспособность программного кода из предыдущего фрагмента: */
+
+      // родительский конструктор
+      function CarMaker() {}
+
+      // метод предка
+      CarMaker.prototype.drive = function () {
+        return “Vroom, I have “ + this.doors + “ doors”;
+      };
+
+      // статический фабричный метод
+      CarMaker.factory = function (type) {
+        var constr = type,
+            newcar;
+
+        // сообщить об ошибке, если конструктор
+        // для запрошенного типа отсутствует
+        if (typeof CarMaker[constr] !== “function”) {
+         throw {
+           name: “Error”,
+           message: constr + “ doesn’t exist”
+         };
+        }
+
+        // в этой точке известно, что требуемый конструктор существует
+        // поэтому определим отношения наследования с предком,
+        // но только один раз
+        if (typeof CarMaker[constr].prototype.drive !== "function") {
+         CarMaker[constr].prototype = new CarMaker();
+        }
+
+        // создать новый экземпляр
+        newcar = new CarMaker[constr]();
+
+        // дополнительно можно вызвать какие-либо методы
+        // и затем вернуть объект...
+        return newcar;
+      };
+
+      // специализированные конструкторы
+      CarMaker.Compact = function () { this.doors = 4; };
+      CarMaker.Convertible = function () { this.doors = 2; };
+      CarMaker.SUV = function () { this.doors = 24; };
+
+      /*
+        В реализации шаблона фабрики нет ничего особенно сложного. Все, что необходимо сделать, – это отыскать функцию-конструктор, которая создаст объект требуемого типа. В данном случае для отображения типов объектов на конструкторы, создающие их, используется простое соглашение об именовании. Часть, где определяются отношения наследования, – это пример реализации повторяющихся операций, общих для всех конструкторов, которые было бы разумно вынести в фабричные методы.
+      */
+    </code>
+  </pre>
+
+  <pre>
+    <code data-language="javascript">
+
+      function factory() {}
+
+      // это будет у всехэкземпляров, созданных фабрикой
+      factory.prototype.say = function(){
+          alert( "Привет. Я : " + this.sex );
+      }
+
+      // фабричный метод
+      factory.make = function(type){
+          var copy;
+
+          // чтобы каждый раз не устанавливать прототип.
+          if (factory[type].prototype.say === undefined) {
+              factory[type].prototype = new factory();
+          }
+
+          copy = new factory[type]();
+
+          // что-нибудь ещё добавляем.
+          copy.creationTime = Date.now();
+
+          return copy;
+      }
+
+      // конструкторы узкоспециализированных классов.
+      factory.male = function() {
+          this.sex = "male";
+      };
+      factory.female = function() {
+          this.sex = "female";
+      };
+
+      // использование
+      var one = factory.make("male");
+      var two = factory.make("female");
+
+      one.say();
+      two.say();
+    </code>
+  </pre>
+
+  <br><br>
+
+  <pre>
+    <code data-language="javascript">
+        function Factory() {
+          this.createEmployee = function (type) {
+              var employee;
+
+              if (type === "fulltime") {
+                  employee = new FullTime();
+              } else if (type === "parttime") {
+                  employee = new PartTime();
+              } else if (type === "temporary") {
+                  employee = new Temporary();
+              } else if (type === "contractor") {
+                  employee = new Contractor();
+              }
+
+              employee.type = type;
+
+              employee.say = function () {
+                  log.add(this.type + ": rate " + this.hourly + "/hour");
+              }
+
+              return employee;
+          }
+      }
+
+      var FullTime = function () {
+          this.hourly = "$12";
+      };
+
+      var PartTime = function () {
+          this.hourly = "$11";
+      };
+
+      var Temporary = function () {
+          this.hourly = "$10";
+      };
+
+      var Contractor = function () {
+          this.hourly = "$15";
+      };
+
+      // log helper
+      var log = (function () {
+          var log = "";
+
+          return {
+              add: function (msg) { log += msg + "\n"; },
+              show: function () { alert(log); log = ""; }
+          }
+      })();
+
+      function run() {
+          var employees = [];
+          var factory = new Factory();
+
+          employees.push(factory.createEmployee("fulltime"));
+          employees.push(factory.createEmployee("parttime"));
+          employees.push(factory.createEmployee("temporary"));
+          employees.push(factory.createEmployee("contractor"));
+
+          for (var i = 0, len = employees.length; i < len; i++) {
+              employees[i].say();
+          }
+
+          log.show();
+      }
+    </code>
+  </pre>
+
+  <a href="../" class='back-button material-icons'>arrow_back</a>
+
+  <script src='../js/rainbow-custom.min.js'></script>
+</body>
+</html>
