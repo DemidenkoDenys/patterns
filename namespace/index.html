@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <script src='strategy.js'></script>
+
+  <link href="../css/back-button.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <title>Стратегия паттерн</title>
+</head>
+
+<body>
+
+  <form oninput='result.value = a.execute(action.value, firstValue.value, secondValue.value)'>
+    <input  name='firstValue' type="number">
+    <select name="action" id="action">
+      <option value="add">+</option>
+      <option value="subtract">-</option>
+      <option value="multiply">*</option>
+      <option value="divide">/</option>
+    </select>
+    <input  name='secondValue' type="number">
+    <p>Результат: <output name='result'></output></p>
+  </form>
+
+  <pre>
+    <code data-language="javascript">
+
+      /** создается глобальная переменная - одна на все приложение */
+      var app = app || {};
+
+      /* Функция создания пространства имен */
+      /* Каждое пространство имени - это свойство главного объекта приложения */
+      app.define = function(namespace){
+
+      	var parts = namespace.split('.'),
+      			parent = app,
+      			i;
+
+      	if(parts[0] == 'app')
+      		parts = parts.slice(1);
+
+      	for(i = 0; i < parts.length; i++){
+      		if(typeof parent[parts[i]] == 'undefined')
+      			parent[parts[i]] = {};
+      		parent = parent[parts[i]];
+      	}
+
+      	return parent;
+      };
+
+      /* Создание пространства с именем menu в header */
+      app.define('header.menu');
+
+      /* Код, который хранится в модуле пространства имен header.menu */
+      app.header.menu = (function(){
+      	/* Код обработки меню в header */
+      })();
+
+    </code>
+  </pre>
+
+  <a href="../" class='back-button material-icons'>arrow_back</a>
+
+  <script src='../js/rainbow-custom.min.js'></script>
+</body>
+</html>
